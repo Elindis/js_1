@@ -1,88 +1,90 @@
-rpsGame();
+// Instead of putting event listeners on each of the buttons,
+// we can listen to the entire play area and then check if
+// what was clicked was a button
+const playArea = document.getElementById('playArea');
+const lastMove = document.getElementById('lastMove');
+let playerScoreCounter = document.getElementById("playerScore");
+let computerScoreCounter = document.getElementById("computerScore");
 
 
-function rpsGame() {
-        
-        let wins = 0;
-        let losses = 0;
+// The function is passed in as an event. This looks like
+// js black-box magic - is it using reflection to check
+// for function names? Scary thought.
+playArea.addEventListener('click', onButtonClick);
 
-        console.log("================================");
-
-        for (let i = 0; i < 5; i++) {
-
-                // Gets an input from the player and retries until the player inputs a valid option
-                let playerMove = getPlayerMove();
-                
-                console.log("You selected: "+playerMove);
-
-                // Converts the player input into 0, 1, or 2
-                let playerConvertedMove = convertMove(playerMove);
-
-                // The computer uses random moves of 0, 1, or 2
-                let computerMove = getRandomInt(3);
-                console.log(`Computer selected: ${convertMove(computerMove)}`);
-
-                // Returns 1 if the player wins, 2 if the computer wins, or 3 in the case of a tie
-                let roundResult = playRound(playerConvertedMove, computerMove);
-
-                console.log("================================");
-
-                if (roundResult === 2) {
-                        ++losses;
-                        continue;
-                }
-                if (roundResult === 1) {
-                        ++wins;
-                }
-        }
-        console.log(`Game over! Wins: ${wins} | Losses: ${losses}`);
+// Now we can build the meat and potatoes.
+function onButtonClick(event) {
+  clickTarget = event.target.className;
+  if (clickTarget === "rockButton") {
+    playRound("rock");
+  }
+  if (clickTarget === "paperButton") {
+    playRound("paper");
+  }
+  if (clickTarget === "scissorsButton") {
+    playRound("scissors");
+  }
 }
 
+function playRound(playerChoice) {
+  // To play a round, we must first make sure that the game isn't already over...
+  if (playerScoreCounter.innerText === "5" || computerScoreCounter.innerText === "5") {
+    console.log("Game over!");
+    lastMove.innerText = "Game over!"
+    return;
+  }
 
+  // Then we can generate a computer decision.
+  const computerChoice = generateComputerChoice();
+  console.log(playerChoice+" "+computerChoice);
+  lastMove.innerText = computerChoice;
 
-function getPlayerMove() {
-        while (true) {
-                let playerMove = prompt("Choose between ROCK, PAPER, or SCISSORS!");
-                playerMove = playerMove.toUpperCase();
-                console.log(playerMove);
-                if (playerMove != "ROCK" && playerMove != "PAPER" && playerMove != "SCISSORS") {
-                        console.log("Invalid input. Try again!");
-                } else {
-                        return playerMove;
-                }
-        } 
+  // If the choices are equal, it's a tie.
+  if (playerChoice === computerChoice) {
+    console.log("tie");
+    return;
+  }
+
+  // Then we can check for a player win, and an 'else' covers the computer win.
+  if (doesPlayerWin(playerChoice, computerChoice)) {
+    processVictory("player");
+  } else {
+    processVictory("computer");
+  }
+
+  // If the game has ended, declare game over.
+  if (playerScoreCounter.innerText === "5" || computerScoreCounter.innerText === "5") {
+    console.log("Game over!");
+    lastMove.innerText = "Game over!"
+  }
 }
 
-function convertMove(playerMove) {
-        const conversionMap = [0, 1, 2, "ROCK", "PAPER", "SCISSORS"];
-        if (typeof(playerMove) === "number") {
-                return conversionMap[playerMove+3];
-        }
-        return conversionMap[conversionMap.indexOf(playerMove)-3];
+function processVictory(winner) {
+  if (winner === "player") {
+    console.log("player wins");
+    let playerScore = parseInt(playerScoreCounter.innerText);
+    playerScore += 1;
+    playerScoreCounter.innerText = playerScore;
+  }
+  if (winner === "computer") {
+    console.log("computer wins");
+    let computerScore = parseInt(computerScoreCounter.innerText);
+    computerScore += 1;
+    computerScoreCounter.innerText = computerScore;
+  }
 }
 
-function playRound(playerMove, computerMove) {
-        if (playerMove === computerMove) {
-                console.log("It's a tie!");
-                return 3;
-        }
-
-        if (nextInArray(playerMove) === computerMove) {
-                console.log(`Computer wins! ${convertMove(computerMove)} beats ${convertMove(playerMove)}`);
-                return 2;
-        } else {
-                console.log(`Player wins! ${convertMove(playerMove)} beats ${convertMove(computerMove)}`); 
-                return 1;
-        } 
+function doesPlayerWin(playerChoice, computerChoice) {
+  return playerChoice === "rock" && computerChoice === "scissors"
+    || playerChoice === "scissors" && computerChoice === "paper"
+    || playerChoice === "paper" && computerChoice === "rock";
 }
 
-function getRandomInt(max) {
-        return Math.floor(Math.random() * max);
-}  
-
-function nextInArray(num) {
-        if (num === 2) {
-                return 0;
-        }
-        return ++num;
+function generateComputerChoice() {
+  const randomInt = Math.floor(Math.random()*3);
+  switch(randomInt) {
+    case 0: return "rock";
+    case 1: return "paper";
+    case 2: return "scissors";
+  }
 }

@@ -1,0 +1,39 @@
+* {
+  color: white;
+}
+
+body {
+  width: 100%;
+  background-color: rgb(38, 29, 39);
+  margin: 0;
+}
+
+.title {
+  padding: 1rem;
+  background-color: rgba(143, 178, 255, 0.405);
+  text-align: center;
+}
+#playArea {
+  padding: 1rem;
+  background-color: rgba(143, 178, 255, 0.405);
+  display: flex;
+  flex: 1 1 110;
+  justify-content: center;
+  align-items: center;
+
+}
+.scoreCounter {
+  padding: 1rem;
+  background-color: rgba(105, 143, 225, 0.405);
+  display: flex;
+  gap: 1rem;
+}
+
+button {
+  padding: 1rem;
+  flex: auto;
+  background-color: rgb(55, 53, 55);
+  box-shadow: none;
+  border-color: black;
+
+}
